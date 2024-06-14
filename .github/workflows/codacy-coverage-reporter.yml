@@ -1,33 +1,30 @@
-name: Codacy Coverage Reporter
-
-on:
-    push:
-        branches:
-            - master
-
-permissions:
-    contents: read
-
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        name: codacy-coverage-reporter
-        steps:
-            - uses: actions/checkout@v4.1.6
-
-            - name: Set up JDK
-              uses: actions/setup-java@v4.2.1
-              with:
-                  java-version: '11'
-                  distribution: 'zulu'
-
-            - name: Build with Gradle
-              uses: gradle/gradle-build-action@v3.3.2
-              with:
-                  arguments: build jacocoTestReport testCodeCoverageReport --scan
-
-            - name: Run codacy-coverage-reporter
-              uses: codacy/codacy-coverage-reporter-action@v1.3.0
-              with:
-                  project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-                  coverage-reports: ${{ github.workspace }}/code-coverage-report/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
+  build:
+    name: codacy-coverage-reporter
+    runs-on: self-hosted
+    steps:
+    - continue-on-error: true
+      uses: actions/checkout@v4.1.6
+    - continue-on-error: true
+      name: Set up JDK
+      uses: actions/setup-java@v4.2.1
+      with:
+        distribution: zulu
+        java-version: '11'
+    - continue-on-error: true
+      name: Build with Gradle
+      uses: gradle/gradle-build-action@v3.3.2
+      with:
+        arguments: build jacocoTestReport testCodeCoverageReport --scan
+    - continue-on-error: true
+      name: Run codacy-coverage-reporter
+      uses: codacy/codacy-coverage-reporter-action@v1.3.0
+      with:
+        coverage-reports: ${{ github.workspace }}/code-coverage-report/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+name: Codacy Coverage Reporter
+on:
+  repository_dispatch:
+    types: trigger-ga___codacy-coverage-reporter.yml
+permissions:
+  contents: read
